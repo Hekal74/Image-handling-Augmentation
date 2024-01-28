@@ -1,0 +1,56 @@
+{
+	"HandlingConfig":{
+        "Detectors": [
+            "DLIB",
+            "CV2",
+            "RetinaFace",
+            "MTCNN",
+            "YOLOv8"
+        ],
+        "Recognizers": [
+            "DLIB"
+        ],
+        "detectorName": "DLIB",
+        "recognizerName": "DLIB"
+	},
+	"ImgConfig":{
+		"LabeledDirectory": "dataset/labeled",
+        "InputImgUrl": "https://i.postimg.cc/9fjyyMjP/IMG-20231225-132606.jpg"
+	},
+	"DetectorConfig": {
+		"DLIB": {
+			"upsampling": 3,
+			"model": "hog"
+		},
+		"CV2": {
+			"scaleFactor": 1.05,
+			"minNeighbors": 4,
+			"minLength": 10,
+			"minWidth": 10
+		},
+		"RetinaFace": {
+			"threshold": 0.5,
+			"upsampleScale": 1
+		},
+		"MTCNN": {
+			"minFaceSize": 10,
+			"thresholds": [
+					0.6,
+				   	0.7,
+				   	0.7
+			],
+			"scaleFactor": 0.709
+		},
+		"YOLOv8": {
+			"confidenceThreshold": 0.2
+		}
+	},
+    "RecognizerConfig": {
+        "DLIB": {
+            "threshold": 0.54,
+            "resample": 8,
+            "encodingModel": "large",
+            "encodingUpdate": 0
+        }
+    }
+}
