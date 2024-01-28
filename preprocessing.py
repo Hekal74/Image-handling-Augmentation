@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import sys
 import os
+import dlib
+from vars import *
+
 
 
 def rotate_image(image, angle):
@@ -13,7 +16,6 @@ def rotate_image(image, angle):
 def flip_image(image):
     return cv2.flip(image, 1)  # 1 for horizontal flip
 
-
 def adjust_brightness_contrast(image, brightness_factor, contrast_factor):
     # Convert image to float32 for adjustment
     image_float = image.astype(np.float32) / 255.0
@@ -24,17 +26,15 @@ def adjust_brightness_contrast(image, brightness_factor, contrast_factor):
     # Convert back to uint8
     adjusted_image = (adjusted_image * 255).astype(np.uint8)
     return adjusted_image
-
 def apply_gaussian_blur(image):
     # Apply Gaussian blur with a random kernel size
-    kernel_size = int(np.random.uniform(1, 5)) * 2 + 1  # Ensure odd kernel size
+    kernel_size = int(np.random.uniform(config["PerprocessingConfig"]["KERNAL"]["value1"], config["PerprocessingConfig"]["KERNAL"]["value2"])) * 2 + 1  # Ensure odd kernel size
     blurred_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
     return blurred_image
-
 def apply_color_jittering(image):
     # Randomly adjust gamma and saturation
-    gamma = np.random.uniform(0.8, 1.2)
-    saturation = np.random.uniform(0.8, 1.2)
+    gamma = np.random.uniform(config["PerprocessingConfig"]["GAMMA"]["value1"], config["PerprocessingConfig"]["GAMMA"]["value2"])
+    saturation = np.random.uniform(config["PerprocessingConfig"]["SATURATION"]["value1"], config["PerprocessingConfig"]["SATURATION"]["value2"])
     # Convert image to HSV
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     # Adjust gamma
@@ -64,6 +64,7 @@ def apply_histogram_equalization(image):
     return equalized_image
 
 
+
 def image_augmentation(image):
     #reading the image
     image = cv2.imread(image)
@@ -73,8 +74,8 @@ def image_augmentation(image):
     # Randomly flip the image horizontally
     flipped_image = flip_image(image)
     # Randomly adjust brightness and contrast
-    brightness_factor = np.random.uniform(0.2, 0.5)
-    contrast_factor = np.random.uniform(0.4, 0.75)
+    brightness_factor = np.random.uniform(config["PerprocessingConfig"]["BRIGHTNESS"]["value1"], config["PerprocessingConfig"]["BRIGHTNESS"]["value2"])
+    contrast_factor = np.random.uniform(config["PerprocessingConfig"]["CONTRAST"]["value1"], config["PerprocessingConfig"]["CONTRAST"]["value2"])
     adjusted_image = adjust_brightness_contrast(image, brightness_factor, contrast_factor)
     # Apply Gaussian blur
     blurred_image = apply_gaussian_blur(image)
@@ -82,16 +83,37 @@ def image_augmentation(image):
     jittered_image = apply_color_jittering(image)
     # Apply noise injection
     noisy_image = apply_noise(image)
-     #apply_histogram_equalization
+    #apply_histogram_equalization
     histo_image = apply_histogram_equalization(image)
+    #flip_Gaussian blur
+    flip_Gaussian_blur = apply_gaussian_blur(flipped_image)
+    #flip_brightness
+    flip_brightness = adjusted_image = adjust_brightness_contrast(flipped_image, brightness_factor, contrast_factor)
+    #flip_histo
+    flip_histo = apply_histogram_equalization(flipped_image)
+    #flip_noise
+    flip_noise = apply_noise(flipped_image)
+    #flip_jittered
+    flip_jittered = apply_color_jittering(flipped_image)
+    #brighness_noise
+    brightness_noise = adjust_brightness_contrast(noisy_image, brightness_factor, contrast_factor)
+    #brighness_histo
+    brightness_histo = adjust_brightness_contrast(histo_image, brightness_factor, contrast_factor)
+    #brighness_gaussian
+    brighness_gaussian = adjust_brightness_contrast(blurred_image, brightness_factor, contrast_factor)
+    #gaussian_jittered
+    gaussian_jittered = blurred_image = apply_gaussian_blur(jittered_image)
+    #gaussian_histo
+    gaussian_histo = blurred_image = apply_gaussian_blur(histo_image)
+    #histo_noise
+    histo_noise = apply_histogram_equalization(noisy_image)
+    #jittered_noise
+    jittered_noise = jittered_image = apply_color_jittering(noisy_image)
+    #jittered_histo
+    jittered_histo = jittered_image = apply_color_jittering(jittered_image)
 
-    #flip_rotated
-    flip_rotated = rotate_image(flipped_image, angle)
-    #more combinations will be added isA
-
-    ####################################################################
+    return rotated_image, flipped_image, adjusted_image, blurred_image, jittered_image, noisy_image , histo_image, flip_Gaussian_blur, flip_brightness, flip_histo, flip_noise, flip_jittered, brightness_noise, brightness_histo, brighness_gaussian, gaussian_jittered, gaussian_histo, histo_noise, jittered_noise, jittered_histo
     
-    return rotated_image, flipped_image, adjusted_image, blurred_image, jittered_image, noisy_image , histo_image, flip_rotated
 
 
 def is_single_person(image_path):
